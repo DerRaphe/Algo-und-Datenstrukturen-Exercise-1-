@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 
 
 public class LineChartDnC extends Application {
+  //
   private int insertionSortBorder = 5;
   private int baseValueForMultiThreading = 4;
   private int countOfListItems = 100;
@@ -162,7 +163,7 @@ public class LineChartDnC extends Application {
       List<Integer> testList = listFactory.giveListToSort(i);
 
       // Merge sort with basic Insertion sort
-      MergeSortBasicInsertion mSi = new MergeSortBasicInsertion(testList, insertionSortBorder);
+      QuickSortInsertion mSi = new QuickSortInsertion(testList);
       ExecutionTimer<List<Integer>> timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSi.divideAndConquer();
       });
