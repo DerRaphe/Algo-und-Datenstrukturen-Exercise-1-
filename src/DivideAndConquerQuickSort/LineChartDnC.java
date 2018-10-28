@@ -178,7 +178,7 @@ public class LineChartDnC extends Application {
       });
       seriesmSmI.getData().add(new XYChart.Data(i, timerStandard.time));
 
-      QuickSortParallel mSbIPa = new QuickSortParallel(testList,
+      /*QuickSortParallel mSbIPa = new QuickSortParallel(testList,
           baseValueForMultiThreading, countOfThreads);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSbIPa.divideAndConquer();
@@ -189,7 +189,7 @@ public class LineChartDnC extends Application {
           baseValueForMultiThreading, countOfThreads);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmIRa.divideAndConquer();
-      });
+      });*/
       seriesmSmIRa.getData().add(new XYChart.Data(i, timerStandard.time));
 
       QuickSortParallelWithInsertion mSmIPa = new QuickSortParallelWithInsertion(testList, insertionSortBorder, baseValueForMultiThreading, countOfThreads);

@@ -2,6 +2,7 @@ package DivideAndConquerQuickSort;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.locks.Lock;
@@ -15,9 +16,11 @@ public class QuickSortParallel
   private int countOfThreads;
   private boolean isInitalised;
   private int isTooSmallForMultiThreading;
+  private int left;
+  private int right;
 
 
-  public QuickSortParallel(List<Integer> listToSort, int isTooSmallForMultiThreading, int threadCount) {
+  public QuickSortParallel(List<Integer> listToSort, int isTooSmallForMultiThreading, int threadCount, int left, int right) {
     this.isTooSmallForMultiThreading = isTooSmallForMultiThreading;
     this.listToSort = listToSort;
     this.countOfThreads =threadCount;
@@ -34,39 +37,22 @@ public class QuickSortParallel
   }
 
   @Override
-  public synchronized List<? extends DivideAndConquerable<List<Integer>>> decompose() {
+  public List<? extends DivideAndConquerable<List<Integer>>> decompose() {
     {
-      int left = 0;
-      int right = listToSort.size();
-      List<QuickSortParallel> decomposed = new ArrayList<QuickSortParallel>();
-      List<Integer> leftList = new ArrayList<>();
-      List<Integer> rightList = new ArrayList<>();
-      int pivot = meadianOfThree(listToSort.get(left),listToSort.get(right/2),listToSort.get(right-1));
-      for (int i = 0; i<right;i++) {
-        if(listToSort.get(i)>pivot)
-          rightList.add(listToSort.get(i));
-        else {
-          if (i == right-1 && leftList.size() == i) {
-            rightList.add(listToSort.get(i));
-          }
-          else
-            leftList.add(listToSort.get(i));
-        }
-      }
-      decomposed.add(new QuickSortParallel(leftList,this.isTooSmallForMultiThreading,this.countOfThreads));
-      decomposed.add(new QuickSortParallel(rightList,this.isTooSmallForMultiThreading,this.countOfThreads));
-      return decomposed;
+      Collections.swap(this.listToSort, meadianOfThree(this.left,this.right), this.right);
+      int mid = partition ();
+      List<QuickSortParallel> ret = new ArrayList<QuickSortParallel>();
+      ret.add(new QuickSortParallel(this.listToSort, this.isTooSmallForMultiThreading,this.countOfThreads, mid+1,this.right));
+      ret.add(new QuickSortParallel(this.listToSort, this.isTooSmallForMultiThreading,this.countOfThreads,this.left,mid-1));
+      return ret;
     }
 
 
   }
 
   @Override
-  public synchronized  List<Integer> recombine(List<List<Integer>> intermediateResults) {
-    List<Integer> recombine = new ArrayList<Integer>();
-    recombine.addAll(intermediateResults.get(0));
-    recombine.addAll(intermediateResults.get(1));
-    return recombine;
+  public  List<Integer> recombine(List<List<Integer>> intermediateResults) {
+    return intermediateResults.get(1);
   }
 
   @Override
@@ -96,13 +82,36 @@ public class QuickSortParallel
 
   }
   
-  private int meadianOfThree (int first, int second, int third) {
+  public int meadianOfThree (int firstIndex, int thirdIndex) {
+    if ((thirdIndex - firstIndex +1)>=3) {
+    int first = this.listToSort.get(firstIndex);
+    int second = this.listToSort.get((firstIndex+thirdIndex)/2);
+    int third = this.listToSort.get(thirdIndex);
     int max = Integer.max(first, Integer.max(second,third));
     int min = Integer.min(first,Integer.min(second,third));
     if(first <max && first > min) 
-      return first;
+      return firstIndex;
     if(second <max && second > min) 
-      return second;    
-    return third;
+      return   (firstIndex+thirdIndex)/2;    
+    return thirdIndex;
+    } else
+      return thirdIndex;
+  }
+  
+  public int partition() {
+    int pivot = this.listToSort.get(this.right);
+    int i = left ;
+    int j = right ;
+    while (i <j ){
+      while (i <j && this.listToSort.get(i) <pivot)
+        i++; // move right ( paint green ) in left partition
+      while (j >i && this.listToSort.get(j) >=pivot)
+        j--; // move left ( paint orange ) in right partition
+      if (i <j) 
+         Collections.swap(this.listToSort, i,j);
+    }
+    Collections.swap(this.listToSort, i,this.right); // "orange - yellow swap "
+    return i; // return mid - element
+
   }
 }
