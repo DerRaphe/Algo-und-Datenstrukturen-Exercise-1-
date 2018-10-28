@@ -21,6 +21,8 @@ public class QuickSortParallel
 
 
   public QuickSortParallel(List<Integer> listToSort, int isTooSmallForMultiThreading, int threadCount, int left, int right) {
+    this.left = left;
+    this.right = right;
     this.isTooSmallForMultiThreading = isTooSmallForMultiThreading;
     this.listToSort = listToSort;
     this.countOfThreads =threadCount;
@@ -28,7 +30,7 @@ public class QuickSortParallel
 
   @Override
   public boolean isBasic() {
-    return this.listToSort.isEmpty() || this.listToSort.size() <= this.baseCase;
+    return this.right < this.left;
   }
 
   @Override
@@ -37,7 +39,7 @@ public class QuickSortParallel
   }
 
   @Override
-  public List<? extends DivideAndConquerable<List<Integer>>> decompose() {
+  public synchronized List<? extends DivideAndConquerable<List<Integer>>> decompose() {
     {
       Collections.swap(this.listToSort, meadianOfThree(this.left,this.right), this.right);
       int mid = partition ();
@@ -51,7 +53,7 @@ public class QuickSortParallel
   }
 
   @Override
-  public  List<Integer> recombine(List<List<Integer>> intermediateResults) {
+  public List<Integer> recombine(List<List<Integer>> intermediateResults) {
     return intermediateResults.get(1);
   }
 
