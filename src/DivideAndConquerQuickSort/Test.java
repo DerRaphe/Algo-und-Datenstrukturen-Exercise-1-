@@ -6,9 +6,9 @@ public class Test {
 
   public static void main(String[] args) {
     // TODO Auto-generated method stub
-    ListFactory listFactory = new ListFactory(12);
+    ListFactory listFactory = new ListFactory(121);
     ListFactory listFactory1 = new ListFactory(12);
-    List<Integer> testListe = listFactory.giveListToSort(12);
+    List<Integer> testListe = listFactory.giveListToSort(121);
     List<Integer> testListe1 = listFactory1.giveListToSort(5);
     QuickSortParallel sorter = new QuickSortParallel(testListe,5,4, 0,testListe.size()-1);
     //QuickSort sorter1 = new QuickSort(testListe1, 0,testListe1.size()-1);
