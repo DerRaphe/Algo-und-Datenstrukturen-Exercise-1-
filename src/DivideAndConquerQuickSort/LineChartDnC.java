@@ -156,6 +156,7 @@ public class LineChartDnC extends Application {
 
   public void setChartValues(Series seriesmSi, Series seriesmSmI, Series seriesmSbIPa,
     Series seriesmSmIRa, Series seriesmSmIPa) {
+    
     ListFactory listFactory = new ListFactory(countOfListItems);
     int counter = countOfListItems/10;
     for (int i = counter; i <= countOfListItems; i += counter) {
@@ -163,7 +164,7 @@ public class LineChartDnC extends Application {
       List<Integer> testList = listFactory.giveListToSort(i);
 
       // Merge sort with basic Insertion sort
-      QuickSortInsertion mSi = new QuickSortInsertion(testList);
+      QuickSortStandart mSi = new QuickSortStandart(testList);
       ExecutionTimer<List<Integer>> timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSi.divideAndConquer();
       });
@@ -177,21 +178,21 @@ public class LineChartDnC extends Application {
       });
       seriesmSmI.getData().add(new XYChart.Data(i, timerStandard.time));
 
-      MergeSortBasicInsertionParallel mSbIPa = new MergeSortBasicInsertionParallel(testList,
-          insertionSortBorder, baseValueForMultiThreading, countOfThreads);
+      QuickSortParallel mSbIPa = new QuickSortParallel(testList,
+          baseValueForMultiThreading, countOfThreads);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSbIPa.divideAndConquer();
       });
       seriesmSbIPa.getData().add(new XYChart.Data(i, timerStandard.time));
 
-      MergeSortBasicInsertionParallel mSmIRa = new MergeSortBasicInsertionParallel(testList,
-          insertionSortBorder, baseValueForMultiThreading, countOfThreads);
+      QuickSortParallel mSmIRa = new QuickSortParallel(testList,
+          baseValueForMultiThreading, countOfThreads);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmIRa.divideAndConquer();
       });
       seriesmSmIRa.getData().add(new XYChart.Data(i, timerStandard.time));
 
-      MergeSortMergeInsertionParallel mSmIPa = new MergeSortMergeInsertionParallel(testList, baseValueForMultiThreading, countOfThreads);
+      QuickSortParallelWithInsertion mSmIPa = new QuickSortParallelWithInsertion(testList, insertionSortBorder, baseValueForMultiThreading, countOfThreads);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmIPa.divideAndConquer();
       });

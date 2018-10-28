@@ -4,10 +4,12 @@ package DivideAndConquerQuickSort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class MergeSortBasicInsertionParallel
+public class QuickSortParallel
     implements DivideAndConquerableParallel<List<Integer>> {
-  private int isToSmallForMergeSort;
+  final private int baseCase = 1;
   private List<Integer> listToSort;
   private ForkJoinPool forkJoinPool;
   private int countOfThreads;
@@ -15,8 +17,7 @@ public class MergeSortBasicInsertionParallel
   private int isTooSmallForMultiThreading;
 
 
-  public MergeSortBasicInsertionParallel(List<Integer> listToSort, int isToSmallForMergeSort, int isTooSmallForMultiThreading, int threadCount) {
-    this.isToSmallForMergeSort = isToSmallForMergeSort;
+  public QuickSortParallel(List<Integer> listToSort, int isTooSmallForMultiThreading, int threadCount) {
     this.isTooSmallForMultiThreading = isTooSmallForMultiThreading;
     this.listToSort = listToSort;
     this.countOfThreads =threadCount;
@@ -24,65 +25,48 @@ public class MergeSortBasicInsertionParallel
 
   @Override
   public boolean isBasic() {
-    return this.listToSort.size() <= this.isToSmallForMergeSort;
+    return this.listToSort.isEmpty() || this.listToSort.size() <= this.baseCase;
   }
 
   @Override
   public List<Integer> baseFun() {
-    if (this.listToSort.size() > 1) {
-      for (int j = 1; j < this.listToSort.size(); j++) { // iterate right
-        Integer value = this.listToSort.get(j); // read right element
-        int i = j - 1; // define initial left position
-        while (i >= 0 && (this.listToSort.get(i) > value)) {
-          this.listToSort.set(i + 1, this.listToSort.get(i)); // while left >right , move left right
-          i--;
-        }
-        this.listToSort.set(i + 1, value); // put right into its proper place
-      }
-    }
     return this.listToSort;
   }
 
   @Override
-  public List<? extends DivideAndConquerable<List<Integer>>> decompose() {
+  public synchronized List<? extends DivideAndConquerable<List<Integer>>> decompose() {
     {
-      List<MergeSortBasicInsertionParallel> newList = new ArrayList<>();
-      int firstHalf = listToSort.size() / 2;
-      int secondHalf = listToSort.size();
-      newList.add(new MergeSortBasicInsertionParallel(listToSort.subList(0, firstHalf),
-          this.isToSmallForMergeSort, this.isTooSmallForMultiThreading, this.countOfThreads));
-      newList.add(new MergeSortBasicInsertionParallel(listToSort.subList(firstHalf, secondHalf),
-          this.isToSmallForMergeSort, this.isTooSmallForMultiThreading, this.countOfThreads));
-      return newList;
+      int left = 0;
+      int right = listToSort.size();
+      List<QuickSortParallel> decomposed = new ArrayList<QuickSortParallel>();
+      List<Integer> leftList = new ArrayList<>();
+      List<Integer> rightList = new ArrayList<>();
+      int pivot = meadianOfThree(listToSort.get(left),listToSort.get(right/2),listToSort.get(right-1));
+      for (int i = 0; i<right;i++) {
+        if(listToSort.get(i)>pivot)
+          rightList.add(listToSort.get(i));
+        else {
+          if (i == right-1 && leftList.size() == i) {
+            rightList.add(listToSort.get(i));
+          }
+          else
+            leftList.add(listToSort.get(i));
+        }
+      }
+      decomposed.add(new QuickSortParallel(leftList,this.isTooSmallForMultiThreading,this.countOfThreads));
+      decomposed.add(new QuickSortParallel(rightList,this.isTooSmallForMultiThreading,this.countOfThreads));
+      return decomposed;
     }
 
 
   }
 
   @Override
-  public List<Integer> recombine(List<List<Integer>> intermediateResults) {
-    List<Integer> recombinedList = new ArrayList<Integer>();
-    int i = 0;
-    int j = 0;
-    int size1 = intermediateResults.get(1).size();
-    int size2 = intermediateResults.get(0).size();
-    while (i < size1 || j < size2) {
-      if (i == size1) {
-        recombinedList.addAll(intermediateResults.get(0).subList(j, size2));
-        j = size2;
-      } else if (j == size2) {
-        recombinedList.addAll(intermediateResults.get(1).subList(i, size1));
-        i = size1;
-      } else {
-        if (intermediateResults.get(1).get(i) >= intermediateResults.get(0).get(j)) {
-          recombinedList.add(intermediateResults.get(0).get(j++));
-        } else {
-          recombinedList.add(intermediateResults.get(1).get(i++));
-        }
-      }
-    }
-
-    return recombinedList;
+  public synchronized  List<Integer> recombine(List<List<Integer>> intermediateResults) {
+    List<Integer> recombine = new ArrayList<Integer>();
+    recombine.addAll(intermediateResults.get(0));
+    recombine.addAll(intermediateResults.get(1));
+    return recombine;
   }
 
   @Override
@@ -110,5 +94,15 @@ public class MergeSortBasicInsertionParallel
   public int numberOfThreadPool() {
     return this.countOfThreads;
 
+  }
+  
+  private int meadianOfThree (int first, int second, int third) {
+    int max = Integer.max(first, Integer.max(second,third));
+    int min = Integer.min(first,Integer.min(second,third));
+    if(first <max && first > min) 
+      return first;
+    if(second <max && second > min) 
+      return second;    
+    return third;
   }
 }
