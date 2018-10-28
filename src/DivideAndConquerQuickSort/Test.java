@@ -10,7 +10,7 @@ public class Test {
     ListFactory listFactory1 = new ListFactory(12);
     List<Integer> testListe = listFactory.giveListToSort(121);
     List<Integer> testListe1 = listFactory1.giveListToSort(5);
-    QuickSortParallel sorter = new QuickSortParallel(testListe,5,4, 0,testListe.size()-1);
+    QuickSortWithInsertion sorter = new QuickSortWithInsertion(testListe,5, 0,testListe.size()-1);
     //QuickSort sorter1 = new QuickSort(testListe1, 0,testListe1.size()-1);
     //System.out.println(testListe);
     //System.out.println("Index: " + sorter.meadianOfThree(5, testListe.size()-1));

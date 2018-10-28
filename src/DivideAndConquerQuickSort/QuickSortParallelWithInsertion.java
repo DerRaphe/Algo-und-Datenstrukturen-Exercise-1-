@@ -2,6 +2,7 @@ package DivideAndConquerQuickSort;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.locks.Lock;
@@ -14,25 +15,29 @@ public class QuickSortParallelWithInsertion
   private ForkJoinPool forkJoinPool;
   private int countOfThreads;
   private boolean isInitalised;
-  private int isTooSmallForMultiThreading;
   private int insertionSortBorder;
+  private int left;
+  private int right;
 
 
-  public QuickSortParallelWithInsertion(List<Integer> listToSort,int insertionSortBorder, int isTooSmallForMultiThreading, int threadCount) {
+  public QuickSortParallelWithInsertion(List<Integer> listToSort,int insertionSortBorder, int threadCount, int left, int right) {
     this.listToSort = listToSort;
     this.countOfThreads = threadCount;
-    this.isTooSmallForMultiThreading = isTooSmallForMultiThreading;
+    this.insertionSortBorder= insertionSortBorder;
+    this.left = left;
+    this.right = right;
+
   }
 
   @Override
-  public boolean isBasic() {
-    return this.listToSort.size() <= this.insertionSortBorder;
+  public synchronized boolean isBasic() {
+    return this.right- this.left <= this.insertionSortBorder;
   }
 
   @Override
-  public List<Integer> baseFun() {
+  public synchronized List<Integer> baseFun() {
     if (this.listToSort.size() > 1) {
-      for (int j = 1; j < this.listToSort.size(); j++) { // iterate right
+      for (int j = this.left; j < this.right; j++) { // iterate right
         Integer value = this.listToSort.get(j); // read right element
         int i = j - 1; // define initial left position
         while (i >= 0 && (this.listToSort.get(i) > value)) {
@@ -46,28 +51,14 @@ public class QuickSortParallelWithInsertion
   }
 
   @Override
-  public List<? extends DivideAndConquerable<List<Integer>>> decompose() {
+  public synchronized List<? extends DivideAndConquerable<List<Integer>>> decompose() {
     {
-      int left = 0;
-      int right = listToSort.size();
-      List<QuickSortParallelWithInsertion> decomposed = new ArrayList<QuickSortParallelWithInsertion>();
-      List<Integer> leftList = new ArrayList<>();
-      List<Integer> rightList = new ArrayList<>();
-      int pivot = meadianOfThree(listToSort.get(left),listToSort.get(right/2),listToSort.get(right-1));
-      for (int i = 0; i<right;i++) {
-        if(listToSort.get(i)>pivot)
-          rightList.add(listToSort.get(i));
-        else {
-          if (i == right-1 && leftList.size() == i) {
-            rightList.add(listToSort.get(i));
-          }
-          else
-            leftList.add(listToSort.get(i));
-        }
-      }
-      decomposed.add(new QuickSortParallelWithInsertion(leftList,this.insertionSortBorder,this.isTooSmallForMultiThreading,this.countOfThreads));
-      decomposed.add(new QuickSortParallelWithInsertion(rightList,this.insertionSortBorder,this.isTooSmallForMultiThreading,this.countOfThreads));
-      return decomposed;
+      Collections.swap(this.listToSort, meadianOfThree(this.left,this.right), this.right);
+      int mid = partition ();
+      List<QuickSortParallelWithInsertion> ret = new ArrayList<QuickSortParallelWithInsertion>();
+      ret.add(new QuickSortParallelWithInsertion(this.listToSort,this.insertionSortBorder,this.countOfThreads,mid+1,this.right));
+      ret.add(new QuickSortParallelWithInsertion(this.listToSort,this.insertionSortBorder,this.countOfThreads,this.left,mid-1));
+      return ret;
       
     }
 
@@ -76,10 +67,7 @@ public class QuickSortParallelWithInsertion
 
   @Override
   public List<Integer> recombine(List<List<Integer>> intermediateResults) {
-    List<Integer> recombine = new ArrayList<Integer>();
-    recombine.addAll(intermediateResults.get(0));
-    recombine.addAll(intermediateResults.get(1));
-    return recombine;
+    return intermediateResults.get(1);
   }
 
   @Override
@@ -89,7 +77,7 @@ public class QuickSortParallelWithInsertion
 
   @Override
   public boolean isTooSmallForMultiThreading() {
-    return this.listToSort.size() <= this.isTooSmallForMultiThreading;
+    return false;
   }
 
   @Override
@@ -108,13 +96,36 @@ public class QuickSortParallelWithInsertion
     return this.countOfThreads;
   }
 
-  private int meadianOfThree (int first, int second, int third) {
+  public int meadianOfThree (int firstIndex, int thirdIndex) {
+    if ((thirdIndex - firstIndex +1)>=3) {
+    int first = this.listToSort.get(firstIndex);
+    int second = this.listToSort.get((firstIndex+thirdIndex)/2);
+    int third = this.listToSort.get(thirdIndex);
     int max = Integer.max(first, Integer.max(second,third));
     int min = Integer.min(first,Integer.min(second,third));
     if(first <max && first > min) 
-      return first;
+      return firstIndex;
     if(second <max && second > min) 
-      return second;    
-    return third;
+      return   (firstIndex+thirdIndex)/2;    
+    return thirdIndex;
+    } else
+      return thirdIndex;
+  }
+  
+  public int partition() {
+    int pivot = this.listToSort.get(this.right);
+    int i = left ;
+    int j = right ;
+    while (i <j ){
+      while (i <j && this.listToSort.get(i) <pivot)
+        i++; // move right ( paint green ) in left partition
+      while (j >i && this.listToSort.get(j) >=pivot)
+        j--; // move left ( paint orange ) in right partition
+      if (i <j) 
+         Collections.swap(this.listToSort, i,j);
+    }
+    Collections.swap(this.listToSort, i,this.right); // "orange - yellow swap "
+    return i; // return mid - element
+
   }
 }

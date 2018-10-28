@@ -164,7 +164,7 @@ public class LineChartDnC extends Application {
       List<Integer> testList = listFactory.giveListToSort(i);
 
       // Merge sort with basic Insertion sort
-      QuickSortStandart mSi = new QuickSortStandart(testList);
+      QuickSortStandart mSi = new QuickSortStandart(testList, 0, testList.size()-1);
       ExecutionTimer<List<Integer>> timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSi.divideAndConquer();
       });
@@ -172,7 +172,7 @@ public class LineChartDnC extends Application {
 
 
       // Merge Sort with Insertion Sort as Merge function
-      MergeSortMergeInsertion mSmI = new MergeSortMergeInsertion(testList);
+      QuickSortWithInsertion mSmI = new QuickSortWithInsertion(testList,insertionSortBorder, 0, testList.size()-1);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmI.divideAndConquer();
       });
@@ -183,16 +183,16 @@ public class LineChartDnC extends Application {
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSbIPa.divideAndConquer();
       });
-      seriesmSbIPa.getData().add(new XYChart.Data(i, timerStandard.time));
-
+      seriesmSbIPa.getData().add(new XYChart.Data(i, timerStandard.time));*/
+      
       QuickSortParallel mSmIRa = new QuickSortParallel(testList,
-          baseValueForMultiThreading, countOfThreads);
+          baseValueForMultiThreading, countOfThreads, 0, testList.size()-1);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmIRa.divideAndConquer();
-      });*/
+      });
       seriesmSmIRa.getData().add(new XYChart.Data(i, timerStandard.time));
 
-      QuickSortParallelWithInsertion mSmIPa = new QuickSortParallelWithInsertion(testList, insertionSortBorder, baseValueForMultiThreading, countOfThreads);
+      QuickSortParallelWithInsertion mSmIPa = new QuickSortParallelWithInsertion(testList, insertionSortBorder, countOfThreads, 0, testList.size()-1);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmIPa.divideAndConquer();
       });
