@@ -129,7 +129,7 @@ public class LineChartDnC extends Application {
     seriesmSmI.setName("Mergesort, Insertionsort as merge function (iterative)");
     seriesmSbIPa.setName("Mergesort, Insertionsort as base function (parallel)");
     seriesmSmIRa.setName("Mergesort, Insertionsort as base function (iterative, merge -> sort whole list)");
-    seriesmSmIPa.setName("Mergesort, Insertionsort as merge function (Parallel)");
+    //seriesmSmIPa.setName("Mergesort, Insertionsort as merge function (Parallel)");
     
     lineChart.getData().add(seriesmSi);
     lineChart.getData().add(seriesmSmI);
