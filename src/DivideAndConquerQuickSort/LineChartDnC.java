@@ -1,5 +1,6 @@
 package DivideAndConquerQuickSort;
 
+import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -23,6 +24,7 @@ public class LineChartDnC extends Application {
   private int baseValueForMultiThreading = 4;
   private int countOfListItems = 100;
   private int countOfThreads = 4;
+  private int numberOfLoops = 10;
   Scene scene1, scene2;
   Pane gr;
   HBox pictureRegion1;
@@ -47,6 +49,8 @@ public class LineChartDnC extends Application {
     borderInsertionSort.setLayoutY(65);
     Label listItemCount = new Label("max list size (10 based): ");
     listItemCount.setLayoutY(95);
+    Label rdmLoop = new Label("Number of rdm loops: ");
+    rdmLoop.setLayoutY(125);
 
     TextField txtCountOfThread = new TextField();
     txtCountOfThread.setLayoutY(5);
@@ -60,6 +64,9 @@ public class LineChartDnC extends Application {
     TextField txtBorderInsertionSort = new TextField();
     txtBorderInsertionSort.setLayoutY(65);
     txtBorderInsertionSort.setLayoutX(200);
+    TextField txtRdmLoop = new TextField();
+    txtRdmLoop.setLayoutY(125);
+    txtRdmLoop.setLayoutX(200);
     
     Button btnSetValues = new Button("show graphic");
     btnSetValues.setLayoutX(260);
@@ -80,12 +87,14 @@ public class LineChartDnC extends Application {
     txtMuliThreadingBase.setText(String.valueOf(baseValueForMultiThreading));
     txtListItemCount.setText(String.valueOf(countOfListItems));
     txtCountOfThread.setText(String.valueOf(countOfThreads));
+    txtRdmLoop.setText(String.valueOf(numberOfLoops));
     
     btnSetValues.setOnAction((event) -> {
       insertionSortBorder = Integer.parseInt(txtBorderInsertionSort.getText());
       baseValueForMultiThreading = Integer.parseInt(txtMuliThreadingBase.getText());
       countOfListItems = Integer.parseInt(txtListItemCount.getText());
       countOfThreads = Integer.parseInt(txtCountOfThread.getText());
+      numberOfLoops = Integer.parseInt(txtRdmLoop.getText());
       
       // creating the chart
       lineChart = new LineChart<Number, Number>(xAxis, yAxis);
@@ -99,18 +108,18 @@ public class LineChartDnC extends Application {
       
       setChartValues(seriesmSi, seriesmSmI, seriesmSbIPa, seriesmSmIRa, seriesmSmIPa);
       // defining a series
-      seriesmSi.setName("Mergesort, Insertionsort as base function (iterative, sort both lists-> merge)");
-      seriesmSmI.setName("Mergesort, Insertionsort as merge function (iterative)");
-      seriesmSbIPa.setName("Mergesort, Insertionsort as base function (parallel)");
+      seriesmSi.setName("Quick Sort Standart");
+      seriesmSmI.setName("Quick Sort with base Insertion");
+      seriesmSbIPa.setName("Quick Sort Parallel");
       seriesmSmIRa.setName("Mergesort, Insertionsort as base function (iterative, merge -> sort whole list)");
-      seriesmSmIPa.setName("Mergesort, Insertionsort as merge function (Parallel)");
+      //seriesmSmIPa.setName("Mergesort, Insertionsort as merge function (Parallel)");
 
       
       lineChart.getData().add(seriesmSi);
       lineChart.getData().add(seriesmSmI);
       lineChart.getData().add(seriesmSbIPa);
       lineChart.getData().add(seriesmSmIRa);
-      lineChart.getData().add(seriesmSmIPa);
+      //lineChart.getData().add(seriesmSmIPa);
       HBox pictureRegion1 = new HBox();
       
       lineChart.setPrefWidth(1000);
@@ -125,20 +134,20 @@ public class LineChartDnC extends Application {
     setChartValues(seriesmSi, seriesmSmI, seriesmSbIPa, seriesmSmIRa, seriesmSmIPa);
 
     // defining a series
-    seriesmSi.setName("Mergesort, Insertionsort as base function (iterative, sort both lists-> merge)");
-    seriesmSmI.setName("Mergesort, Insertionsort as merge function (iterative)");
-    seriesmSbIPa.setName("Mergesort, Insertionsort as base function (parallel)");
-    seriesmSmIRa.setName("Mergesort, Insertionsort as base function (iterative, merge -> sort whole list)");
+    seriesmSi.setName("Quick Sort Standart");
+    seriesmSmI.setName("Quick Sort with basic Insertion Sort");
+    seriesmSbIPa.setName("Quick Sort Parallel");
+    seriesmSmIRa.setName("Quick Sort Parallel with basic Insertion Sort");
     //seriesmSmIPa.setName("Mergesort, Insertionsort as merge function (Parallel)");
     
     lineChart.getData().add(seriesmSi);
     lineChart.getData().add(seriesmSmI);
     lineChart.getData().add(seriesmSbIPa);
     lineChart.getData().add(seriesmSmIRa);
-    lineChart.getData().add(seriesmSmIPa);
+    //lineChart.getData().add(seriesmSmIPa);
 
      gr = new Pane(countOfThread, muliThreadingBase, listItemCount,borderInsertionSort,
-        txtCountOfThread ,txtMuliThreadingBase , txtListItemCount,txtBorderInsertionSort, btnSetValues);
+        txtCountOfThread ,txtMuliThreadingBase , txtListItemCount,txtBorderInsertionSort, btnSetValues,txtRdmLoop,rdmLoop);
      gr.setPrefWidth(10); 
      
      HBox pictureRegion1 = new HBox();
@@ -156,19 +165,30 @@ public class LineChartDnC extends Application {
 
   public void setChartValues(Series seriesmSi, Series seriesmSmI, Series seriesmSbIPa,
     Series seriesmSmIRa, Series seriesmSmIPa) {
+    List<ListFactory> factories = new ArrayList<ListFactory>();
+    for(int h = 0; h<numberOfLoops; h++) {
+      factories.add(new ListFactory(countOfListItems));
+    }
     
-    ListFactory listFactory = new ListFactory(countOfListItems);
+    //ListFactory listFactory = new ListFactory(countOfListItems);
     int counter = countOfListItems/10;
     for (int i = counter; i <= countOfListItems; i += counter) {
+      List<Long> results = new ArrayList<Long>(4);
+      results.add((long) 0);
+      results.add((long) 0);
+      results.add((long) 0);
+      results.add((long) 0);
       // List which has to be sorted
-      List<Integer> testList = listFactory.giveListToSort(i);
+      for(int j = 0 ; j<numberOfLoops; j++) {
+      List<Integer> testList = factories.get(j).giveListToSort(i);
 
       // Merge sort with basic Insertion sort
       QuickSortStandart mSi = new QuickSortStandart(testList, 0, testList.size()-1);
       ExecutionTimer<List<Integer>> timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSi.divideAndConquer();
       });
-      seriesmSi.getData().add(new XYChart.Data(i, timerStandard.time));
+      results.set(0, results.get(0) +timerStandard.time);
+      //seriesmSi.getData().add(new XYChart.Data(i, timerStandard.time));
 
 
       // Merge Sort with Insertion Sort as Merge function
@@ -176,28 +196,35 @@ public class LineChartDnC extends Application {
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmI.divideAndConquer();
       });
-      seriesmSmI.getData().add(new XYChart.Data(i, timerStandard.time));
+      results.set(1, results.get(1) +timerStandard.time);
+      //seriesmSmI.getData().add(new XYChart.Data(i, timerStandard.time));
 
-      /*QuickSortParallel mSbIPa = new QuickSortParallel(testList,
-          baseValueForMultiThreading, countOfThreads);
-      timerStandard = new ExecutionTimer<List<Integer>>(() -> {
-        return mSbIPa.divideAndConquer();
-      });
-      seriesmSbIPa.getData().add(new XYChart.Data(i, timerStandard.time));*/
       
       QuickSortParallel mSmIRa = new QuickSortParallel(testList,
           baseValueForMultiThreading, countOfThreads, 0, testList.size()-1);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmIRa.divideAndConquer();
       });
-      seriesmSmIRa.getData().add(new XYChart.Data(i, timerStandard.time));
+      results.set(2, results.get(2) +timerStandard.time);
+      //seriesmSbIPa.getData().add(new XYChart.Data(i, timerStandard.time));
 
       QuickSortParallelWithInsertion mSmIPa = new QuickSortParallelWithInsertion(testList, insertionSortBorder, countOfThreads, 0, testList.size()-1);
       timerStandard = new ExecutionTimer<List<Integer>>(() -> {
         return mSmIPa.divideAndConquer();
       });
-      seriesmSmIPa.getData().add(new XYChart.Data(i, timerStandard.time));
-
+      results.set(3, results.get(3) +timerStandard.time);
+      //seriesmSmIRa.getData().add(new XYChart.Data(i, timerStandard.time));
+      
+      }
+      seriesmSi.getData().add(new XYChart.Data(i, results.get(0)/numberOfLoops));
+      
+      seriesmSmI.getData().add(new XYChart.Data(i, results.get(1)/numberOfLoops));
+      
+      seriesmSbIPa.getData().add(new XYChart.Data(i, results.get(2)/numberOfLoops));
+      
+      seriesmSmIRa.getData().add(new XYChart.Data(i, results.get(3)/numberOfLoops));
     }
+    
+    
   }
 }
