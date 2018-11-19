@@ -7,12 +7,13 @@ public class BinarySearchLog {
   private static double tolerance = 0.0000001;
   private static int iterationCount;
   
-  public BinarySearchLog (double numbertoSquare,double left,double right) throws  IllegalArgumentException{
+  public BinarySearchLog (double numbertoSquare,double left,double right, double tolerance) throws  IllegalArgumentException{
     if (Double.compare(numbertoSquare, 1)<=0)
       throw new IllegalArgumentException("The input has t be bigger or then 1");
     this.numberToSquare = numbertoSquare;
     this.left = left;
     this.right = right;
+    this.tolerance = tolerance;
   }
   //Math.abs(c-1.0) <= 0.000001
   
@@ -23,9 +24,9 @@ public class BinarySearchLog {
     if (Math.abs(this.numberToSquare-midSquared) <=this.tolerance) {
       return mid;
     } else if(Double.compare(this.numberToSquare, midSquared)>0) {
-      return new BinarySearchLog(this.numberToSquare,mid,this.right).BinarySearch();
+      return new BinarySearchLog(this.numberToSquare,mid,this.right, this.tolerance).BinarySearch();
     }
-    return new BinarySearchLog(this.numberToSquare,this.left,mid).BinarySearch();
+    return new BinarySearchLog(this.numberToSquare,this.left,mid, this.tolerance).BinarySearch();
   }
   
   private void countUp() {
