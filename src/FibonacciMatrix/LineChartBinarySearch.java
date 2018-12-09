@@ -1,6 +1,7 @@
 package FibonacciMatrix;
 
 
+import java.math.BigInteger;
 import java.util.List;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -84,7 +85,7 @@ public class LineChartBinarySearch extends Application {
   private void addData() {
     for (int i = 0 ; i<200;i += 5) {
       FibonacciMatrix fiboComputer = new FibonacciMatrix(i);
-      ExecutionTimer<Integer> timerStandard = new ExecutionTimer<Integer>(() -> {
+      ExecutionTimer<BigInteger> timerStandard = new ExecutionTimer<BigInteger>(() -> {
         return fiboComputer.fibreturn();
       });
       if (i>1) {
@@ -92,7 +93,7 @@ public class LineChartBinarySearch extends Application {
         logarithmicSerie.getData().add(new XYChart.Data(i, 50*Math.log(i)));
         linearSerie.getData().add(new XYChart.Data(i, 5*i));
         quadraticSerie.getData().add(new XYChart.Data(i, 0.2*i*i));
-        cubicSerie.getData().add(new XYChart.Data(i, 0.0005*i*i*i));
+        cubicSerie.getData().add(new XYChart.Data(i, 0.002*i*i*i));
       }
     }
     
