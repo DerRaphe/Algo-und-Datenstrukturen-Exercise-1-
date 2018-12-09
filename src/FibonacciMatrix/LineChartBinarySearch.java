@@ -23,10 +23,7 @@ public class LineChartBinarySearch extends Application {
   Pane pictureRegion1;
   
   
-  private int numberToSquare = 17;
-  private int numberToLog = 10;
-  private double squareTolerance = 0.0000001;
-  private double logTolerance = 0.0000001;
+
 
   @Override
   public void start(Stage primaryStage) throws Exception {
@@ -48,20 +45,13 @@ public class LineChartBinarySearch extends Application {
     lineChartSquare.setLayoutY(50);
     lineChartSquare.setTitle("count of iteration for square");
 
-    lineChartLog = new LineChart<Number, Number>(xAxisLg, yAxisLg);
-    lineChartLog.setTitle("count of iteration for log (base 2)");
-    lineChartLog.setPrefWidth(850);
-    lineChartLog.setPrefHeight(400);
-    lineChartLog.setLayoutY(500);
     
  // defining a series
     seriesSquare = new XYChart.Series();
     seriesLog = new XYChart.Series();
     seriesSquare.setName("number of iterations for sqaure a number");
-    seriesLog.setName("number of iterations for calculate log of a number");
 
     lineChartSquare.getData().add(seriesSquare);
-    lineChartLog.getData().add(seriesLog);
     pictureRegion1 = new Pane();
     
     gr = new Pane();
@@ -69,10 +59,9 @@ public class LineChartBinarySearch extends Application {
      
     
     pictureRegion1.getChildren().add(lineChartSquare);
-    pictureRegion1.getChildren().add(lineChartLog);
     pictureRegion1.getChildren().add(gr);
     
-    scene1 = new Scene(pictureRegion1, 900, 900);
+    scene1 = new Scene(pictureRegion1, 900, 450);
     primaryStage.setScene(scene1);
     primaryStage.show();
     
