@@ -1,6 +1,7 @@
 package FibonacciMatrix;
 
 
+import java.util.List;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -17,7 +18,7 @@ import javafx.stage.Stage;
 public class LineChartBinarySearch extends Application {
   LineChart<Number, Number> lineChartSquare;
   LineChart<Number, Number> lineChartLog;
-  XYChart.Series seriesLog,seriesSquare;
+  XYChart.Series fibonacciSerie;
   Scene scene1, scene2;
   Pane gr;
   Pane pictureRegion1;
@@ -47,11 +48,10 @@ public class LineChartBinarySearch extends Application {
 
     
  // defining a series
-    seriesSquare = new XYChart.Series();
-    seriesLog = new XYChart.Series();
-    seriesSquare.setName("number of iterations for sqaure a number");
-
-    lineChartSquare.getData().add(seriesSquare);
+    fibonacciSerie = new XYChart.Series();
+    fibonacciSerie.setName("number of iterations for sqaure a number");
+    addData();
+    lineChartSquare.getData().add(fibonacciSerie);
     pictureRegion1 = new Pane();
     
     gr = new Pane();
@@ -68,6 +68,17 @@ public class LineChartBinarySearch extends Application {
   }
   public static void main(String[] args) {
     launch(args);
+  }
+  
+  private void addData() {
+    for (int i = 1 ; i<10000;i += 5) {
+      FibonacciMatrix test1 = new FibonacciMatrix(i);
+      ExecutionTimer<Integer> timerStandard = new ExecutionTimer<Integer>(() -> {
+        return test1.fibreturn();
+      });
+      fibonacciSerie.getData().add(new XYChart.Data(i, timerStandard.time));
+    }
+    
   }
   /*private void SetChartValues(Series seriesSquare, Series seriesLog) {
     int counterSquare = numberToSquare;
