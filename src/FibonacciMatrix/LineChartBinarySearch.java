@@ -82,16 +82,18 @@ public class LineChartBinarySearch extends Application {
   }
   
   private void addData() {
-    for (int i = 10 ; i<200;i += 10) {
+    for (int i = 0 ; i<200;i += 5) {
       FibonacciMatrix fiboComputer = new FibonacciMatrix(i);
       ExecutionTimer<Integer> timerStandard = new ExecutionTimer<Integer>(() -> {
         return fiboComputer.fibreturn();
       });
-      fibonacciSerie.getData().add(new XYChart.Data(i, timerStandard.time));
-      logarithmicSerie.getData().add(new XYChart.Data(i, 50*Math.log(i)));
-      linearSerie.getData().add(new XYChart.Data(i, 5*i));
-      quadraticSerie.getData().add(new XYChart.Data(i, 0.2*i*i));
-      cubicSerie.getData().add(new XYChart.Data(i, 0.0005*i*i*i));
+      if (i>1) {
+        fibonacciSerie.getData().add(new XYChart.Data(i, timerStandard.time));
+        logarithmicSerie.getData().add(new XYChart.Data(i, 50*Math.log(i)));
+        linearSerie.getData().add(new XYChart.Data(i, 5*i));
+        quadraticSerie.getData().add(new XYChart.Data(i, 0.2*i*i));
+        cubicSerie.getData().add(new XYChart.Data(i, 0.0005*i*i*i));
+      }
     }
     
   }
