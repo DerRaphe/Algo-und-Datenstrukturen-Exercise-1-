@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 public class LineChartBinarySearch extends Application {
   LineChart<Number, Number> lineChartSquare;
   LineChart<Number, Number> lineChartLog;
-  XYChart.Series fibonacciSerie;
+  XYChart.Series fibonacciSerie,logarithmicSerie,linearSerie,quadraticSerie,cubicSerie;
   Scene scene1, scene2;
   Pane gr;
   Pane pictureRegion1;
@@ -31,12 +31,9 @@ public class LineChartBinarySearch extends Application {
     primaryStage.setTitle("Line Chart Binarysearch");
     final NumberAxis xAxisSq = new NumberAxis();
     final NumberAxis yAxisSq = new NumberAxis();
-    xAxisSq.setLabel("Number to square");
-    yAxisSq.setLabel("iteration count");
-    final NumberAxis xAxisLg = new NumberAxis();
-    final NumberAxis yAxisLg = new NumberAxis();
-    xAxisLg.setLabel("Number to log");
-    yAxisLg.setLabel("iteration count");
+    xAxisSq.setLabel("fibonacci of n");
+    yAxisSq.setLabel("Time in ms");
+
     
     
     //Linechart settings
@@ -44,14 +41,28 @@ public class LineChartBinarySearch extends Application {
     lineChartSquare.setPrefWidth(850);
     lineChartSquare.setPrefHeight(400);
     lineChartSquare.setLayoutY(50);
-    lineChartSquare.setTitle("count of iteration for square");
+    lineChartSquare.setTitle("Time complexity of Fibonacci Matrix");
 
     
  // defining a series
     fibonacciSerie = new XYChart.Series();
-    fibonacciSerie.setName("number of iterations for sqaure a number");
+    logarithmicSerie = new XYChart.Series();
+    linearSerie = new XYChart.Series();
+    quadraticSerie = new XYChart.Series();
+    cubicSerie = new XYChart.Series();
+    
+    fibonacciSerie.setName("Fibonacci Matrix");
+    logarithmicSerie.setName("ln");
+    linearSerie.setName("Linear");
+    quadraticSerie.setName("Quadratic");
+    cubicSerie.setName("Cubic");
+    
     addData();
     lineChartSquare.getData().add(fibonacciSerie);
+    lineChartSquare.getData().add(logarithmicSerie);
+    lineChartSquare.getData().add(linearSerie);
+    lineChartSquare.getData().add(quadraticSerie);
+    lineChartSquare.getData().add(cubicSerie);
     pictureRegion1 = new Pane();
     
     gr = new Pane();
@@ -71,38 +82,18 @@ public class LineChartBinarySearch extends Application {
   }
   
   private void addData() {
-    for (int i = 1 ; i<10000;i += 5) {
-      FibonacciMatrix test1 = new FibonacciMatrix(i);
+    for (int i = 10 ; i<200;i += 10) {
+      FibonacciMatrix fiboComputer = new FibonacciMatrix(i);
       ExecutionTimer<Integer> timerStandard = new ExecutionTimer<Integer>(() -> {
-        return test1.fibreturn();
+        return fiboComputer.fibreturn();
       });
       fibonacciSerie.getData().add(new XYChart.Data(i, timerStandard.time));
+      logarithmicSerie.getData().add(new XYChart.Data(i, 50*Math.log(i)));
+      linearSerie.getData().add(new XYChart.Data(i, 5*i));
+      quadraticSerie.getData().add(new XYChart.Data(i, 0.2*i*i));
+      cubicSerie.getData().add(new XYChart.Data(i, 0.0005*i*i*i));
     }
     
   }
-  /*private void SetChartValues(Series seriesSquare, Series seriesLog) {
-    int counterSquare = numberToSquare;
- //   if(counterSquare <= 1) {counterSquare = counterSquare + 1;};
-    for (int i = 2; i <= numberToSquare; i++) {
-      //Square
-      BinarySearchSquareRoot squaredNr = new BinarySearchSquareRoot(i,1,i, squareTolerance);
-      System.out.println(squaredNr.BinarySearch());
-      System.out.println(squaredNr.getCounter());
-      seriesSquare.getData().add(new XYChart.Data(i, squaredNr.getCounter()));   
-      squaredNr.resetCounter();
-    }
-    
-    int counterLog = numberToLog;
-    // if(counterLog <= 1) {counterLog = counterLog + 1;};
-     for (int i = 2; i <= numberToLog; i ++) {      
-       //Log
-       BinarySearchLog logedNr =  new BinarySearchLog(i,1,i, logTolerance);
-       System.out.println(logedNr.BinarySearch());
-       System.out.println(logedNr.getCounter());
-       seriesLog.getData().add(new XYChart.Data(i, logedNr.getCounter()));
-       logedNr.resetCounter();
-       
-     }
-     
-  }*/
+  
 }
